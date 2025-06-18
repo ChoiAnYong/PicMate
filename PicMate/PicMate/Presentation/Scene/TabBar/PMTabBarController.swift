@@ -13,7 +13,7 @@ final class PMTabBarController: UITabBarController {
         
         setStyle()
         addTabBarController()
-        self.selectedIndex = PMTabBarItem.allCases.firstIndex(of: .cleanUp) ?? 0
+        self.selectedIndex = PMTabBarItem.allCases.firstIndex(of: .fullPhoto) ?? 0
     }
 }
 
