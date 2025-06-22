@@ -12,6 +12,10 @@ import UIKit
 import SnapKit
 import Then
 
+protocol PhotoCollctionViewDelegate: AnyObject {
+    func didSelectPhoto(_ photo: PhotoItem)
+}
+
 final class PhotoCollectionView: UIView , BaseViewProtocol {
     private var dataSource: UICollectionViewDiffableDataSource<Section, PhotoItem>!
     private let collectionView = UICollectionView(
@@ -22,6 +26,9 @@ final class PhotoCollectionView: UIView , BaseViewProtocol {
     private let imageManager = PHCachingImageManager()
     private var currentColumnCount: CGFloat = 5.0
     private var possibleColumnCounts: [CGFloat] = [1.0, 3.0, 5.0, 7.0, 9.0, 11.0, 13.0, 15.0]
+    private var didScaleDuringPinch = false
+    
+    weak var delegate: PhotoCollctionViewDelegate?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -61,7 +68,7 @@ final class PhotoCollectionView: UIView , BaseViewProtocol {
         }
     }
     
-    func setDelegate(viewController: UICollectionViewDelegateFlowLayout) {
+    func setDelegate(viewController: UICollectionViewDelegate) {
         collectionView.delegate = viewController
     }
     
@@ -94,26 +101,43 @@ private extension PhotoCollectionView {
         collectionView.addGestureRecognizer(pinchGesture)
     }
     
-    @objc private func handlePinchGesture(_ gesture: UIPinchGestureRecognizer) {
-        if gesture.state == .changed {
+    @objc
+    private func handlePinchGesture(_ gesture: UIPinchGestureRecognizer) {
+        switch gesture.state {
+        case .began:
+            didScaleDuringPinch = false
+            
+        case .changed:
+            guard !didScaleDuringPinch else { return }
+            
             let scale = gesture.scale
+            
             if scale > 1.1 {
                 if let index = possibleColumnCounts.firstIndex(of: currentColumnCount),
                    index > 0 {
                     currentColumnCount = possibleColumnCounts[index - 1]
+                    didScaleDuringPinch = true
                 }
             } else if scale < 0.9 {
                 if let index = possibleColumnCounts.firstIndex(of: currentColumnCount),
                    index < possibleColumnCounts.count - 1 {
                     currentColumnCount = possibleColumnCounts[index + 1]
+                    didScaleDuringPinch = true
                 }
             }
             
-            UIView.animate(withDuration: 0.3) {
-                self.collectionView.collectionViewLayout.invalidateLayout()
+            if didScaleDuringPinch {
+                UIView.animate(withDuration: 0.25, delay: 0, options: [.curveEaseInOut]) {
+                    self.collectionView.collectionViewLayout.invalidateLayout()
+                }
             }
             
+        case .ended, .cancelled, .failed:
             gesture.scale = 1.0
+            didScaleDuringPinch = false
+            
+        default:
+            break
         }
     }
 }
@@ -127,5 +151,11 @@ extension PhotoCollectionView: UICollectionViewDelegateFlowLayout {
         let width = collectionView.frame.inset(by: collectionView.contentInset).width / currentColumnCount
         let height = width
         return CGSize(width: width, height: height)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if let item = dataSource.itemIdentifier(for: indexPath) {
+            delegate?.didSelectPhoto(item)
+        }
     }
 }
