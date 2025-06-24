@@ -10,10 +10,10 @@ import UIKit
 final class PhotoItem: NSObject {
     var createDate: Date
     var identifier: String
-    var mediaType: Int
+    var mediaType: Int16
     var thumbnail: UIImage?
     
-    init(createDate: Date, identifier: String, mediaType: Int, thumbnail: UIImage? = nil) {
+    init(createDate: Date, identifier: String, mediaType: Int16, thumbnail: UIImage? = nil) {
         self.createDate = createDate
         self.identifier = identifier
         self.mediaType = mediaType
