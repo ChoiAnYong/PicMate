@@ -5,15 +5,15 @@
 //  Created by 최안용 on 6/22/25.
 //
 
-import Foundation
+import UIKit
+import Photos
 
 import RxSwift
 import RxRelay
-import Photos
-import UIKit
 
 final class PhotoPageViewModel {
     private let isFavorite: Bool
+    
     let reloadTrigger = PublishRelay<Void>()
     
     let snapshot = BehaviorRelay<NSDiffableDataSourceSnapshot<Section, PhotoItem>>(value: .init())
@@ -22,7 +22,10 @@ final class PhotoPageViewModel {
     
     init(isFavorite: Bool) {
         self.isFavorite = isFavorite
-        
+        bind()
+    }
+    
+    private func bind() {
         reloadTrigger
             .subscribe(onNext: { [weak self] in
                 self?.fetchPhotoItem()
