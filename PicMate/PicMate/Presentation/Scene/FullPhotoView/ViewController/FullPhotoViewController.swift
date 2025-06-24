@@ -36,7 +36,7 @@ final class FullPhotoViewController: UIViewController {
         loadPhotoAssets()
         setStyle()
         setUI()
-        SetLayout()
+        setLayout()
         setDelegate()
         bind()
         PHPhotoLibrary.shared().register(self)
@@ -72,7 +72,7 @@ private extension FullPhotoViewController {
         }
     }
     
-    func SetLayout() {
+    func setLayout() {
         segmentedControl.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide)
             $0.directionalHorizontalEdges.equalToSuperview()
@@ -208,9 +208,13 @@ extension FullPhotoViewController: PHPhotoLibraryChangeObserver {
     }
 }
 
+// MARK: - PhotoCollctionViewDelegate
 extension FullPhotoViewController: PhotoCollctionViewDelegate {
     func didSelectPhoto(_ photo: PhotoItem) {
-        let detailVC = PhotoDetailViewController(item: photo)
-        navigationController?.pushViewController(detailVC, animated: true)
+        let destination = PhotoDetailViewController(item: photo)
+        destination.modalPresentationStyle = .overFullScreen
+        DispatchQueue.main.async { [weak self] in
+            self?.present(destination, animated: true)
+        }
     }
 }
