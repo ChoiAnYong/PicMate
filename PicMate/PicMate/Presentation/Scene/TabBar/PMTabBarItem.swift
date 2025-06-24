@@ -50,7 +50,7 @@ enum PMTabBarItem: CaseIterable {
         case .cleanUp:
             return CleanUpViewController()
         case .fullPhoto:
-            return UINavigationController(rootViewController: FullPhotoViewController())
+            return FullPhotoViewController()
         case .album:
             return AlbumViewController()
         }
