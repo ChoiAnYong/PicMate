@@ -17,8 +17,9 @@ final class PhotoDetailView: UIView, BaseViewProtocol {
     let headerView = UIView()
     private let titleLabel = UILabel()
     let dateLabel = UILabel()
-    private let closeButton = UIButton(type: .system)
-    private let favoriteButton = UIButton(type: .system)
+    let closeButton = UIButton(type: .system)
+    let favoriteButton = UIButton()
+    let deleteButton = UIButton()
     let footerView = UIView()
     
     override init(frame: CGRect) {
@@ -75,7 +76,13 @@ final class PhotoDetailView: UIView, BaseViewProtocol {
         
         favoriteButton.do {
             $0.setImage(.init(systemName: "star"), for: .normal)
+            $0.setImage(.init(systemName: "star.fill"), for: .selected)
             $0.tintColor = .yellow
+        }
+        
+        deleteButton.do {
+            $0.setImage(.init(systemName: "trash"), for: .normal)
+            $0.tintColor = .white
         }
     }
     
@@ -83,7 +90,7 @@ final class PhotoDetailView: UIView, BaseViewProtocol {
         addSubViews(scrollView, headerView, footerView)
         scrollView.addSubViews(imageView)
         headerView.addSubViews(closeButton, titleLabel, dateLabel)
-        footerView.addSubViews(favoriteButton)
+        footerView.addSubViews(favoriteButton, deleteButton)
     }
     
     func setLayout() {
@@ -129,7 +136,13 @@ final class PhotoDetailView: UIView, BaseViewProtocol {
         favoriteButton.snp.makeConstraints {
             $0.top.equalTo(footerView.snp.top).inset(15)
             $0.centerX.equalTo(footerView.snp.centerX)
-            $0.size.equalTo(20)
+            $0.size.equalTo(25)
+        }
+        
+        deleteButton.snp.makeConstraints {
+            $0.top.equalTo(footerView.snp.top).inset(15)
+            $0.trailing.equalTo(footerView.snp.trailing).inset(25)
+            $0.size.equalTo(25)
         }
     }
 }
