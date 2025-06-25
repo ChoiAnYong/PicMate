@@ -8,11 +8,13 @@
 import UIKit
 
 import RxSwift
+import RxRelay
 
 final class PhotoDetailViewController: UIViewController {
     private let rootView: PhotoDetailView = PhotoDetailView()
     private let viewModel: PhotoDetailViewModel
     
+    private let loadTrigger = PublishRelay<Void>()
     private let disposeBag = DisposeBag()
     
     init(item: PhotoItem) {
@@ -31,20 +33,45 @@ final class PhotoDetailViewController: UIViewController {
     }
     
     override func viewDidLoad() {
-        bind()
+        bindViewModel()
+        setUpAction()
+        loadTrigger.accept(())
         navigationController?.isNavigationBarHidden = true
     }
     
-    private func bind() {
-        viewModel.fullSizeImage
-            .compactMap { $0 }
-            .bind(to: rootView.imageView.rx.image)
+    private func bindViewModel() {
+        let input = PhotoDetailViewModel.Input(
+            loadTrigger: loadTrigger.asObservable(),
+            toggleFavoriteTrigger: rootView.favoriteButton.rx.tap.asObservable(),
+            deleteTrigger: rootView.deleteButton.rx.tap.asObservable()
+        )
+        
+        let output = viewModel.transform(input: input, disposeBag: disposeBag)
+        
+        output.createImageDate
+            .drive(rootView.dateLabel.rx.text)
             .disposed(by: disposeBag)
-        viewModel.createImageDate
-            .compactMap { $0 }
-            .bind(to: rootView.dateLabel.rx.text)
+        
+        output.fullSizeImage
+            .drive(rootView.imageView.rx.image)
             .disposed(by: disposeBag)
-        viewModel.loadTrigger.accept(())
+        
+        output.isFavorite
+            .drive(rootView.favoriteButton.rx.isSelected)
+            .disposed(by: disposeBag)
+        
+        output.deleteResult
+            .drive(onNext: { [weak self] in
+                guard let self = self else { return }
+                self.dismiss(animated: true)
+            })
+            .disposed(by: disposeBag)
+        
+        output.errorMessage
+            .drive { error in
+                print("오류: \(error)")
+            }
+            .disposed(by: disposeBag)
     }
 }
 
@@ -106,5 +133,21 @@ extension PhotoDetailViewController: UIGestureRecognizerDelegate {
         
         let velocity = panGesture.velocity(in: rootView)
         return abs(velocity.y) > abs(velocity.x)
+    }
+}
+
+// MARK: - ButtonAction
+private extension PhotoDetailViewController {
+    func setUpAction() {
+        rootView.closeButton.addTarget(
+            self,
+            action: #selector(didTabCloseButton),
+            for: .touchUpInside
+        )
+    }
+    
+    @objc
+    func didTabCloseButton() {
+        dismiss(animated: true)
     }
 }
