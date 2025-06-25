@@ -76,6 +76,12 @@ final class PhotoCollectionView: UIView , BaseViewProtocol {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             self.dataSource.apply(snapshot, animatingDifferences: true)
+            
+            let lastItem = snapshot.itemIdentifiers.last
+            if let lastItem = lastItem,
+               let indexPath = self.dataSource.indexPath(for: lastItem) {
+                self.collectionView.scrollToItem(at: indexPath, at: .bottom, animated: false)
+            }
         }
     }
 }
