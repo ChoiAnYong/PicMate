@@ -49,7 +49,8 @@ final class PhotoPageViewModel {
                 let item = PhotoItem(
                     createDate: date,
                     identifier: asset.localIdentifier,
-                    mediaType: Int16(asset.mediaType.rawValue)
+                    mediaType: Int16(asset.mediaType.rawValue),
+                    isFavorite: asset.isFavorite
                 )
                 items.append(item)
             }

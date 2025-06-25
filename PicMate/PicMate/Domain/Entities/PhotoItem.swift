@@ -11,11 +11,19 @@ final class PhotoItem: NSObject {
     var createDate: Date
     var identifier: String
     var mediaType: Int16
+    var isFavorite: Bool
     var thumbnail: UIImage?
     
-    init(createDate: Date, identifier: String, mediaType: Int16, thumbnail: UIImage? = nil) {
+    init(
+        createDate: Date,
+        identifier: String,
+        mediaType: Int16,
+        isFavorite: Bool,
+        thumbnail: UIImage? = nil
+    ) {
         self.createDate = createDate
         self.identifier = identifier
+        self.isFavorite = isFavorite
         self.mediaType = mediaType
         self.thumbnail = thumbnail
     }
