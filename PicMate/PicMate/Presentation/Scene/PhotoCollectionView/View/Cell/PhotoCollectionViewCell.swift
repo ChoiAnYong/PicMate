@@ -13,6 +13,8 @@ final class PhotoCollectionViewCell: UICollectionViewCell {
     private let videoMarkView = UIImageView()
     private let livePhotoMarkView = UIImageView()
     
+    private var imageLoadTask: Task<Void, Never>?
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -25,9 +27,33 @@ final class PhotoCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+        imageLoadTask?.cancel()
+        imageLoadTask = nil
+        videoMarkView.isHidden = true
+        livePhotoMarkView.isHidden = true
+        imageView.image = nil
+    }
+    
     func configure(with photoAsset: PhotoItem, imageManager: PHImageManager) {
         if let thumbnail = photoAsset.thumbnail {
             self.imageView.image = thumbnail
+            
+            let asset = PHAsset.fetchAssets(withLocalIdentifiers: [photoAsset.identifier], options: nil).firstObject
+            if let asset = asset {
+                let mediaType = PHAssetMediaType(rawValue: Int(photoAsset.mediaType)) ?? .unknown
+                switch mediaType {
+                case .image:
+                    if asset.mediaSubtypes.contains(.photoLive) {
+                        self.livePhotoMarkView.isHidden = false
+                    }
+                case .video:
+                    self.videoMarkView.isHidden = false
+                default:
+                    break
+                }
+            }
+            return
         } else {
             let asset = PHAsset.fetchAssets(withLocalIdentifiers: [photoAsset.identifier], options: nil).firstObject
             
@@ -39,7 +65,8 @@ final class PhotoCollectionViewCell: UICollectionViewCell {
                 options.isSynchronous = false
                 options.isNetworkAccessAllowed = true
                 
-                Task {
+                imageLoadTask = Task { [weak self] in
+                    guard let self else { return }
                     let image = await withCheckedContinuation { continuation in
                         PHCachingImageManager.default().requestImage(
                             for: asset,
@@ -51,20 +78,22 @@ final class PhotoCollectionViewCell: UICollectionViewCell {
                         }
                     }
                     
-                    self.imageView.image = image
-                    photoAsset.thumbnail = image
-                }
-                
-                let mediaType = PHAssetMediaType(rawValue: Int(photoAsset.mediaType)) ?? .unknown
-                switch mediaType {
-                case .image:
-                    if asset.mediaSubtypes.contains(.photoLive) {
-                        livePhotoMarkView.isHidden = false
+                    guard !Task.isCancelled else { return }
+                    await MainActor.run {
+                        self.imageView.image = image
+                        photoAsset.thumbnail = image
+                        let mediaType = PHAssetMediaType(rawValue: Int(photoAsset.mediaType)) ?? .unknown
+                        switch mediaType {
+                        case .image:
+                            if asset.mediaSubtypes.contains(.photoLive) {
+                                self.livePhotoMarkView.isHidden = false
+                            }
+                        case .video:
+                            self.videoMarkView.isHidden = false
+                        default:
+                            break
+                        }
                     }
-                case .video:
-                    videoMarkView.isHidden = false
-                default:
-                    break
                 }
             }
         }
