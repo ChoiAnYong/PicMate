@@ -13,14 +13,33 @@ final class PMTabBarController: UITabBarController {
         
         setStyle()
         addTabBarController()
-        self.selectedIndex = PMTabBarItem.allCases.firstIndex(of: .fullPhoto) ?? 0
+        self.selectedIndex = PMTabBarItem.allCases.firstIndex(of: .cleanUp) ?? 0
     }
 }
 
 private extension PMTabBarController {
     func setStyle() {
         view.backgroundColor = .white
-        tabBar.backgroundColor = .white
+        
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .white
+        
+        let normalAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.font(.pretendardMedium, ofSize: 11),
+            .foregroundColor: UIColor.tabTitle
+        ]
+        
+        let selectedAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.font(.pretendardMedium, ofSize: 11),
+            .foregroundColor: UIColor.selectedTabTitle
+        ]
+        
+        appearance.stackedLayoutAppearance.normal.titleTextAttributes = normalAttributes
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = selectedAttributes
+        
+        tabBar.standardAppearance = appearance
+        tabBar.scrollEdgeAppearance = appearance
     }
     
     func addTabBarController() {
@@ -51,19 +70,6 @@ private extension PMTabBarController {
             image: image.withRenderingMode(.alwaysOriginal),
             selectedImage: selectedImage.withRenderingMode(.alwaysOriginal)
         )
-        
-        let normalAttributes: [NSAttributedString.Key: Any] = [
-            .font: UIFont.font(.pretendardMedium, ofSize: 11),
-            .foregroundColor: UIColor.tabTitle
-        ]
-        
-        let selectedAttributes: [NSAttributedString.Key: Any] = [
-            .font: UIFont.font(.pretendardMedium, ofSize: 11),
-            .foregroundColor: UIColor.selectedTabTitle
-        ]
-        
-        tabBarItem.setTitleTextAttributes(normalAttributes, for: .normal)
-        tabBarItem.setTitleTextAttributes(selectedAttributes, for: .selected)
         
         viewController.tabBarItem = tabBarItem
         
