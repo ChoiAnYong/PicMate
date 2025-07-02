@@ -31,6 +31,7 @@ final class CleanUpViewController: UIViewController {
         setRegister()
         setNavigationTitle()
         bindViewModel()
+        checkPermission()
         PHPhotoLibrary.shared().register(self)
     }
     
@@ -167,5 +168,41 @@ extension CleanUpViewController: PHPhotoLibraryChangeObserver {
             guard let self else { return }
             self.loadTrigger.accept(())
         }
+    }
+}
+
+private extension CleanUpViewController {
+    func checkPermission() {
+        PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
+            switch status {
+            case .authorized:
+                print("📸 사진 라이브러리 접근 허용됨")
+            default:
+                DispatchQueue.main.async { [weak self] in
+                    self?.showPhotoPermissionAlert()
+                }
+            }
+        }
+    }
+    
+    func showPhotoPermissionAlert() {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first else { return }
+        
+        let alert = UIAlertController(
+            title: "사진 전체 접근 권한 필요",
+            message: "앱을 이용하려면 사진 전체 접근 권한이 필요합니다. 설정에서 사진 권한을 허용해주세요.",
+            preferredStyle: .alert
+        )
+        
+        alert.addAction(UIAlertAction(title: "설정으로 이동", style: .default) { _ in
+            if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(settingsUrl)
+            }
+        })
+        
+        alert.addAction(UIAlertAction(title: "취소", style: .cancel))
+        
+        window.rootViewController?.present(alert, animated: true)
     }
 }
