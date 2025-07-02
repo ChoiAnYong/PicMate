@@ -40,8 +40,9 @@ final class FullPhotoViewController: UIViewController {
         setDelegate()
         bind()
         PHPhotoLibrary.shared().register(self)
+        navigationItem.title = "사진"
     }
-        
+
     deinit {
         PHPhotoLibrary.shared().unregisterChangeObserver(self)
     }
@@ -171,7 +172,6 @@ private extension FullPhotoViewController {
                 DispatchQueue.main.async { [weak self] in
                     self?.showPhotoPermissionAlert()
                 }
-
             }
         }
     }
