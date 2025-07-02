@@ -113,7 +113,7 @@ final class PhotoDetailView: UIView, BaseViewProtocol {
         
         closeButton.snp.makeConstraints {
             $0.leading.equalTo(headerView.snp.leading).inset(15)
-            $0.bottom.equalTo(headerView.snp.bottom).inset(30)
+            $0.top.equalTo(headerView.snp.top).inset(70)
             $0.size.equalTo(20)
         }
         
