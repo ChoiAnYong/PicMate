@@ -9,6 +9,7 @@ import UIKit
 import Photos
 
 final class PhotoCollectionViewCell: UICollectionViewCell {
+    static let imageManager = PHCachingImageManager.default()
     private let imageView = UIImageView()
     private let videoMarkView = UIImageView()
     private let livePhotoMarkView = UIImageView()
@@ -32,10 +33,9 @@ final class PhotoCollectionViewCell: UICollectionViewCell {
         imageLoadTask = nil
         videoMarkView.isHidden = true
         livePhotoMarkView.isHidden = true
-        imageView.image = nil
     }
     
-    func configure(with photoAsset: PhotoItem, imageManager: PHImageManager) {
+    func configure(with photoAsset: PhotoItem) {
         if let thumbnail = photoAsset.thumbnail {
             self.imageView.image = thumbnail
             
@@ -55,7 +55,10 @@ final class PhotoCollectionViewCell: UICollectionViewCell {
             }
             return
         } else {
-            let asset = PHAsset.fetchAssets(withLocalIdentifiers: [photoAsset.identifier], options: nil).firstObject
+            let asset = PHAsset.fetchAssets(
+                withLocalIdentifiers: [photoAsset.identifier],
+                options: nil
+            ).firstObject
             
             if let asset = asset {
                 let size = CGSize(width: self.bounds.width, height: self.bounds.height)
@@ -68,7 +71,7 @@ final class PhotoCollectionViewCell: UICollectionViewCell {
                 imageLoadTask = Task { [weak self] in
                     guard let self else { return }
                     let image = await withCheckedContinuation { continuation in
-                        PHCachingImageManager.default().requestImage(
+                        PhotoCollectionViewCell.imageManager.requestImage(
                             for: asset,
                             targetSize: size,
                             contentMode: .aspectFill,
