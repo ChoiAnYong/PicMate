@@ -26,8 +26,7 @@ final class PhotoPageViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(photoCollectionView)
-        photoCollectionView.snp.makeConstraints { $0.edges.equalToSuperview() }
-        
+        photoCollectionView.snp.makeConstraints { $0.edges.equalToSuperview() }        
         bind()
     }
     
