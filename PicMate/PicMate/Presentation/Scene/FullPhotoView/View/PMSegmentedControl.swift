@@ -12,9 +12,9 @@ import Then
 final class PMSegmentedControl: UISegmentedControl {
     private lazy var underLineView: UIView = {
         let width = self.bounds.width / CGFloat(self.numberOfSegments)
-        let height = 2.0
+        let height = 3.0
         let xPosition = CGFloat(self.selectedSegmentIndex * Int(width))
-        let yPosition = self.bounds.size.height - 2.0
+        let yPosition = self.bounds.size.height - 3.0
         let frame = CGRect(x: xPosition, y: yPosition, width: width, height: height)
         let view = UIView(frame: frame)
         view.backgroundColor = .black
@@ -40,7 +40,6 @@ final class PMSegmentedControl: UISegmentedControl {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        
         layer.cornerRadius = 0
         let underLineFinalXPosition = (self.bounds.width / CGFloat(self.numberOfSegments)) * CGFloat(self.selectedSegmentIndex)
         UIView.animate(withDuration: 0.2) {
@@ -51,9 +50,9 @@ final class PMSegmentedControl: UISegmentedControl {
 
 private extension PMSegmentedControl {
     func removeBackgroundAndDivider() {
-        let image = UIImage()
-        
         self.do {
+            let image = UIImage()
+            
             $0.setBackgroundImage(image, for: .normal, barMetrics: .default)
             $0.setBackgroundImage(image, for: .selected, barMetrics: .default)
             $0.setBackgroundImage(image, for: .highlighted, barMetrics: .default)
@@ -67,14 +66,14 @@ private extension PMSegmentedControl {
             $0.setTitleTextAttributes(
                 [
                     .foregroundColor: UIColor.tabTitle,
-                    .font: UIFont.font(.pretendardSemiBold, ofSize: 13)
+                    .font: UIFont.font(.pretendardSemiBold, ofSize: 16)
                 ],
                 for: .normal
             )
             $0.setTitleTextAttributes(
                 [
-                    .foregroundColor: UIColor.selectedTabTitle,
-                    .font: UIFont.font(.pretendardSemiBold, ofSize: 13)
+                    .foregroundColor: UIColor.black,
+                    .font: UIFont.font(.pretendardSemiBold, ofSize: 16)
                 ],
                 for: .selected
             )
