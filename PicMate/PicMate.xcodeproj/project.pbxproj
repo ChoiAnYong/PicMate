@@ -175,6 +175,7 @@
 				DEVELOPMENT_TEAM = 63K349422G;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PicMate/Resources/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PicMate;
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "사진";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -208,6 +209,7 @@
 				DEVELOPMENT_TEAM = 63K349422G;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PicMate/Resources/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PicMate;
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "사진";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
