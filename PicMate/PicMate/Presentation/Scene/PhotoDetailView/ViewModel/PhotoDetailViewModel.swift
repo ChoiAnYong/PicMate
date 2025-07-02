@@ -10,7 +10,6 @@ import UIKit
 
 import RxSwift
 import RxRelay
-import Photos
 import RxCocoa
 
 final class PhotoDetailViewModel: ViewModelType {
