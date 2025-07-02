@@ -10,7 +10,7 @@ import UIKit
 enum PMTabBarItem: CaseIterable {
     case cleanUp
     case fullPhoto
-    case album    
+//    case album    
     
     var title: String {
         switch self {
@@ -18,8 +18,8 @@ enum PMTabBarItem: CaseIterable {
             return "정리하기"
         case .fullPhoto:
             return "전체 사진"
-        case .album:
-            return "앨범"
+//        case .album:
+//            return "앨범"
         }
     }
     
@@ -29,8 +29,8 @@ enum PMTabBarItem: CaseIterable {
             return UIImage(resource: .icSelectedCleanUp)
         case .fullPhoto:
             return UIImage(resource: .icSelectedFullPhoto)
-        case .album:
-            return UIImage(resource: .icSelectedAlbum)
+//        case .album:
+//            return UIImage(resource: .icSelectedAlbum)
         }
     }
     
@@ -40,19 +40,27 @@ enum PMTabBarItem: CaseIterable {
             return UIImage(resource: .icCleanUp)
         case .fullPhoto:
             return UIImage(resource: .icFullPhoto)
-        case .album:
-            return UIImage(resource: .icAlbum)
+//        case .album:
+//            return UIImage(resource: .icAlbum)
         }
     }
     
     var viewController: UIViewController {
         switch self {
         case .cleanUp:
-            return CleanUpViewController()
+            let vc = UINavigationController(rootViewController: CleanUpViewController())
+            vc.setupBarAppearance()
+            return vc
+            
         case .fullPhoto:
-            return FullPhotoViewController()
-        case .album:
-            return AlbumViewController()
+            let vc = UINavigationController(rootViewController: FullPhotoViewController())
+            vc.setupBarAppearance()
+            return vc
+//            
+//        case .album:            
+//            let vc = UINavigationController(rootViewController: AlbumViewController())
+//            vc.setupBarAppearance()
+//            return vc
         }
     }
 }
