@@ -25,7 +25,7 @@ final class PhotoCollectionView: UIView , BaseViewProtocol {
     
     private let imageManager = PHCachingImageManager()
     private var currentColumnCount: CGFloat = 5.0
-    private var possibleColumnCounts: [CGFloat] = [1.0, 3.0, 5.0, 7.0, 9.0, 11.0, 13.0, 15.0]
+    private var possibleColumnCounts: [CGFloat] = [1.0, 3.0, 5.0, 7.0/*, 9.0, 11.0, 13.0, 15.0*/]
     private var didScaleDuringPinch = false
     
     weak var delegate: PhotoCollctionViewDelegate?
@@ -97,7 +97,7 @@ private extension PhotoCollectionView {
                 return PhotoCollectionViewCell()
             }
             
-            cell.configure(with: photoAsset, imageManager: self.imageManager)
+            cell.configure(with: photoAsset)
             return cell
         }
     }
