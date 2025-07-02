@@ -36,7 +36,6 @@ final class PhotoDetailViewController: UIViewController {
         bindViewModel()
         setUpAction()
         loadTrigger.accept(())
-        navigationController?.isNavigationBarHidden = true
     }
     
     private func bindViewModel() {
