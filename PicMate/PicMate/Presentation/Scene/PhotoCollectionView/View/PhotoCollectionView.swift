@@ -102,46 +102,77 @@ private extension PhotoCollectionView {
         }
     }
     
-    private func setupPinchGesture() {
+    func setupPinchGesture() {
         let pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(handlePinchGesture(_:)))
         collectionView.addGestureRecognizer(pinchGesture)
     }
     
     @objc
-    private func handlePinchGesture(_ gesture: UIPinchGestureRecognizer) {
+    func handlePinchGesture(_ gesture: UIPinchGestureRecognizer) {
+        guard let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout else { return }
+
         switch gesture.state {
         case .began:
             didScaleDuringPinch = false
-            
+
         case .changed:
             guard !didScaleDuringPinch else { return }
-            
+
             let scale = gesture.scale
-            
-            if scale > 1.1 {
-                if let index = possibleColumnCounts.firstIndex(of: currentColumnCount),
-                   index > 0 {
-                    currentColumnCount = possibleColumnCounts[index - 1]
-                    didScaleDuringPinch = true
+            let pinchLocation = gesture.location(in: collectionView)
+
+            guard let indexPath = collectionView.indexPathForItem(at: pinchLocation) else { return }
+
+            var newColumnCount = currentColumnCount
+            if scale > 1.05 {
+                if let index = possibleColumnCounts.firstIndex(of: currentColumnCount), index > 0 {
+                    newColumnCount = possibleColumnCounts[index - 1]
                 }
-            } else if scale < 0.9 {
-                if let index = possibleColumnCounts.firstIndex(of: currentColumnCount),
-                   index < possibleColumnCounts.count - 1 {
-                    currentColumnCount = possibleColumnCounts[index + 1]
-                    didScaleDuringPinch = true
-                }
-            }
-            
-            if didScaleDuringPinch {
-                UIView.animate(withDuration: 0.25, delay: 0, options: [.curveEaseInOut]) {
-                    self.collectionView.collectionViewLayout.invalidateLayout()
+            } else if scale < 0.95 {
+                if let index = possibleColumnCounts.firstIndex(of: currentColumnCount), index < possibleColumnCounts.count - 1 {
+                    newColumnCount = possibleColumnCounts[index + 1]
                 }
             }
-            
+
+            guard newColumnCount != currentColumnCount else { return }
+            currentColumnCount = newColumnCount
+            didScaleDuringPinch = true
+
+            UIView.performWithoutAnimation {
+                collectionView.collectionViewLayout.invalidateLayout()
+                collectionView.layoutIfNeeded()
+
+                guard let newAttributes = layout.layoutAttributesForItem(at: indexPath) else { return }
+                let newCellCenter = newAttributes.center
+
+                let collectionCenter = CGPoint(
+                    x: collectionView.bounds.width / 2,
+                    y: collectionView.bounds.height / 2
+                )
+
+                let delta = CGPoint(
+                    x: newCellCenter.x - collectionCenter.x,
+                    y: newCellCenter.y - collectionCenter.y
+                )
+
+                var newOffset = CGPoint(
+                    x: delta.x,
+                    y: delta.y
+                )
+
+                let maxOffsetX = max(0, collectionView.contentSize.width - collectionView.bounds.width)
+                let maxOffsetY = max(0, collectionView.contentSize.height - collectionView.bounds.height)
+
+                newOffset.x = max(0, min(maxOffsetX, newOffset.x))
+                newOffset.y = max(0, min(maxOffsetY, newOffset.y))
+
+                self.collectionView.setContentOffset(newOffset, animated: false)
+            }
+
         case .ended, .cancelled, .failed:
             gesture.scale = 1.0
             didScaleDuringPinch = false
-            
+
         default:
             break
         }
